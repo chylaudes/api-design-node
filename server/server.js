@@ -1,4 +1,4 @@
-// TODO: user app.params to find the lion using the id
+// TO DO: user app.params to find the lion using the id
 // and then attach the lion to the req object and call next. Then in
 // '/lion/:id' just send back req.lion
 
@@ -19,18 +19,28 @@ var lions = [];
 var id = 0;
 
 var updateId = function(req, res, next) {
+  req.body.id = id;
+  ++id;
+  next();
   // fill this out. this is the route middleware for the ids
 };
 
-app.use(morgan('dev'))
+app.use(morgan('dev'));
 app.use(express.static('client'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 
-app.param('id', function(req, res, next, id) {
+app.param('id', function(req, res, next, id) { //checks for a param before doing something
+  var lion = _.find(lions, {id:parseInt(req.params.id)});
   // fill this out to find the lion based off the id
   // and attach it to req.lion. Rember to call next()
+  if (lion){ //if there is a lion
+    req.lion = lion;
+    next();
+  } else {  //send back nothing
+    res.status(500).send();
+  }
 });
 
 app.get('/lions', function(req, res){
@@ -39,7 +49,7 @@ app.get('/lions', function(req, res){
 
 app.get('/lions/:id', function(req, res){
   // use req.lion
-  res.json(lion || {});
+  res.json(req.lion || {});
 });
 
 app.post('/lions', updateId, function(req, res) {
@@ -54,7 +64,7 @@ app.post('/lions', updateId, function(req, res) {
 app.put('/lions/:id', function(req, res) {
   var update = req.body;
   if (update.id) {
-    delete update.id
+    delete update.id;
   }
 
   var lion = _.findIndex(lions, {id: req.params.id});
@@ -63,6 +73,13 @@ app.put('/lions/:id', function(req, res) {
   } else {
     var updatedLion = _.assign(lions[lion], update);
     res.json(updatedLion);
+  }
+});
+
+app.use(function(err, req, res, next) { //ERROR Middle ware  //catches one error it goes to next.
+  if (err){
+    console.error(err);
+    res.status(500).send('Something broke!', err);
   }
 });
 
