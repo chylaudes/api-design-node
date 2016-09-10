@@ -6,6 +6,7 @@
 
 // setup config first before anything by requiring it
 var config = require('./server/config/config');
+//we exported the app
 var app = require('./server/server');
 // logger is a wrapper around console.log that adds color,
 // logs objects as json and can be conditionally turned off
@@ -14,5 +15,3 @@ var logger = require('./server/util/logger');
 
 app.listen(config.port);
 logger.log('listening on http://localhost:' + config.port);
-
-

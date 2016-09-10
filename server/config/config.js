@@ -13,7 +13,7 @@ var config = {
 process.env.NODE_ENV = process.env.NODE_ENV || config.dev;
 // set config.env to whatever the NODE_ENV is
 config.env = process.env.NODE_ENV;
-// TODO
+// TO DO
 // envConfig is nothing right now, but it should be an object.
 // depending on what ever config.env is, load up the appropriate file
 // add assign the value to envConfig so the merge at the bottom actually works.
@@ -22,5 +22,15 @@ config.env = process.env.NODE_ENV;
 // env we are in. We then merge those objects with the env config overriting
 // the default config if here. We then export that new object for our app to use
 var envConfig;
+try { //a try catch =  you can put anything in the try block to run, but if there's an error
+//then the catch block takes in the error and returns what ever is in the catch block
+//this won't trap the server, it keeps going cause we caught the error
+  envConfig = require('./' + config.env);
+  // just making sure the require actually
+  // got something back :)
+  envConfig = envConfig || {};
+} catch(e) {
+  envConfig = {};
+}
 
 module.exports = _.merge(config, envConfig);
