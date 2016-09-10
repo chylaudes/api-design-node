@@ -1,8 +1,10 @@
 var Post = require('./postModel');
 var _ = require('lodash');
-
+//exports because we're going to use them in our router
 exports.params = function(req, res, next, id) {
   Post.findById(id)
+    .populate('author categories')// this doesn't save, only on call time.  It hydrates the objects
+    .exec()
     .then(function(post) {
       if (!post) {
         next(new Error('No post with that id'));
@@ -16,7 +18,14 @@ exports.params = function(req, res, next, id) {
 };
 
 exports.get = function(req, res, next) {
-  // need to populate here
+  Post.find({})
+    .populate('author categories')// this doesn't save, only on call time.  It hydrates the objects
+    .exec() // we use exec because we want a promise
+    .then(function(users){
+      res.json(users);
+    }, function(err){
+      next(err);
+    });
 };
 
 exports.getOne = function(req, res, next) {
@@ -37,7 +46,7 @@ exports.put = function(req, res, next) {
     } else {
       res.json(saved);
     }
-  })
+  });
 };
 
 exports.post = function(req, res, next) {
