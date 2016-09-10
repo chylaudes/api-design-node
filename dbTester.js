@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-
+mongoose.connect('mongodb://localhost/todos');
 // connect to a database so the below will work.
 // what's happening is that we're createing a new schema
 // and making a todos collection and a Todo model.
@@ -16,6 +16,7 @@ var TodoSchema = new mongoose.Schema({
 });
 
 var Todo = mongoose.model('todo', TodoSchema);
+//"todos" mongo with lowercase it and pluarlize it
 Todo.create({
   name: 'clean up your room!!!',
   completed: false
