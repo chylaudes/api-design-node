@@ -22,10 +22,10 @@ UserSchema.pre('save', function(next) {
   if (!this.isModified('password')) return next();
   this.password = this.encryptPassword(this.password);
   next();
-})
+});
 
 
-UserSchema.methods = {
+UserSchema.methods = {// this is instance method
   // check the passwords on signin
   authenticate: function(plainTextPword) {
     return bcrypt.compareSync(plainTextPword, this.password);

@@ -23,6 +23,17 @@ exports.decodeToken = function() {
 
 exports.getFreshUser = function() {
   return function(req, res, next) {
+    User.findById(req.user._id)
+      .then(function(user){
+        if (!user) {
+          res.status(401).send("Unauthroized");
+        } else{
+          req.user = user;
+          next();
+        }
+      }, function(err){
+        next(err);
+      });
     // we'll have access to req.user here
     // because we'll use decodeToken in before
     // this function in the middleware stack.
@@ -37,7 +48,7 @@ exports.getFreshUser = function() {
     // update req.user with fresh user from the
     // stale token data
 
-  }
+  };
 };
 
 exports.verifyUser = function() {
@@ -49,11 +60,28 @@ exports.verifyUser = function() {
 
     // look user up in the DB so we can check
     // if the passwords match for the username
-
+    if (!username || !password ) {
+      res.status(400).send('You need a username and password');
+      return;
+    }
     // use the authenticate() method on a user doc. Passin
     // in the posted password, it will hash the
     // password the same way as the current passwords got hashed
-
+    User.findOne({username: username}) // finding the user with a unique user name
+      .then(function(user){ //promise resolution
+        if (!user) { // if there is no user
+          res.status(401).send('No user with the given username');
+        } else { // authenticate the user with the password
+          if(!user.authenticate(password)) {
+            res.status(401).send('Wrong Password');
+          } else {
+            req.user = user;
+            next();
+          }
+        }
+      }, function(err) {
+          next(err);
+      });
 
   };
 };
